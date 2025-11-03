@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block title %}{{ wine.name }} · Винный погреб{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 mb-0">{{ wine.name }}</h1>
+    <p class="text-muted mb-0">{{ wine.producer or 'Неизвестный производитель' }}</p>
+  </div>
+  <div class="btn-group">
+    <a class="btn btn-outline-secondary" href="{{ url_for('edit_wine', wine_id=wine.id) }}">Редактировать</a>
+    <form method="post" action="{{ url_for('delete_wine', wine_id=wine.id) }}" onsubmit="return confirm('Удалить вино?');">
+      <button type="submit" class="btn btn-outline-danger">Удалить</button>
+    </form>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h2 class="h5">Сводка</h2>
+        <ul class="list-unstyled">
+          <li><strong>Регион:</strong> {{ wine.region or '—' }}</li>
+          <li><strong>Год урожая:</strong> {{ wine.year or '—' }}</li>
+          <li><strong>Сорта:</strong> {{ wine.grapes or '—' }}</li>
+          <li><strong>Всего бутылок:</strong> {{ wine.total_quantity or 0 }}</li>
+          <li><strong>Оценочная стоимость:</strong> {{ '%.2f'|format(wine.estimated_value) }} ₽</li>
+        </ul>
+        {% if wine.notes %}
+        <h3 class="h6 mt-4">Заметки</h3>
+        <p>{{ wine.notes }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h5 mb-0">Бутылки</h2>
+          <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addBottleModal">Добавить бутылку</button>
+        </div>
+        {% if wine.bottles %}
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Дата покупки</th>
+                <th>Кол-во</th>
+                <th>Цена</th>
+                <th>Место хранения</th>
+                <th>Заметки</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for bottle in wine.bottles|sort(attribute='purchase_date', reverse=true) %}
+              <tr>
+                <td>{{ bottle.purchase_date.strftime('%d.%m.%Y') }}</td>
+                <td>{{ bottle.quantity }}</td>
+                <td>{{ '%.2f'|format(bottle.price) if bottle.price is not none else '—' }}</td>
+                <td>{{ bottle.storage_location or '—' }}</td>
+                <td>{{ bottle.notes or '—' }}</td>
+                <td>
+                  <form method="post" action="{{ url_for('delete_bottle', bottle_id=bottle.id) }}" onsubmit="return confirm('Удалить запись?');">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Удалить</button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+          <p class="text-muted mb-0">Пока нет бутылок. Добавьте первую закупку.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addBottleModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" action="{{ url_for('create_bottle') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">Добавить бутылку</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="wine_id" value="{{ wine.id }}">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="purchase_date" class="form-label">Дата покупки*</label>
+              <input type="date" class="form-control" id="purchase_date" name="purchase_date" required value="{{ now.strftime('%Y-%m-%d') }}">
+            </div>
+            <div class="col-md-3">
+              <label for="quantity" class="form-label">Количество*</label>
+              <input type="number" min="1" class="form-control" id="quantity" name="quantity" value="1">
+            </div>
+            <div class="col-md-3">
+              <label for="price" class="form-label">Цена за бутылку (₽)</label>
+              <input type="number" step="0.01" class="form-control" id="price" name="price">
+            </div>
+            <div class="col-md-6">
+              <label for="storage_location" class="form-label">Место хранения</label>
+              <input type="text" class="form-control" id="storage_location" name="storage_location">
+            </div>
+            <div class="col-12">
+              <label for="notes" class="form-label">Заметки</label>
+              <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Добавить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

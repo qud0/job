@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Каталог вин · Винный погреб{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h3">Каталог вин</h1>
+  <a class="btn btn-primary" href="{{ url_for('create_wine') }}">Добавить вино</a>
+</div>
+
+{% if wines %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Название</th>
+          <th>Производитель</th>
+          <th>Регион</th>
+          <th>Год</th>
+          <th>Бутылки</th>
+          <th>Стоимость</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for wine in wines %}
+        <tr>
+          <td><a href="{{ url_for('view_wine', wine_id=wine.id) }}">{{ wine.name }}</a></td>
+          <td>{{ wine.producer or '—' }}</td>
+          <td>{{ wine.region or '—' }}</td>
+          <td>{{ wine.year or '—' }}</td>
+          <td>{{ wine.total_quantity or 0 }}</td>
+          <td>{{ '%.2f'|format(wine.estimated_value) }} ₽</td>
+          <td>
+            <div class="btn-group btn-group-sm" role="group">
+              <a class="btn btn-outline-secondary" href="{{ url_for('edit_wine', wine_id=wine.id) }}">Редактировать</a>
+              <form method="post" action="{{ url_for('delete_wine', wine_id=wine.id) }}" onsubmit="return confirm('Удалить вино?');">
+                <button type="submit" class="btn btn-outline-danger">Удалить</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="text-center text-muted py-5">
+    <p class="lead">Каталог пуст.</p>
+    <p>Нажмите «Добавить вино», чтобы внести первое наименование.</p>
+  </div>
+{% endif %}
+{% endblock %}
