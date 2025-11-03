@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Дашборд · Винный погреб{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-md-4">
+    <div class="card text-bg-primary">
+      <div class="card-body">
+        <h5 class="card-title">Всего бутылок</h5>
+        <p class="display-6">{{ total_bottles }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-success">
+      <div class="card-body">
+        <h5 class="card-title">Оценочная стоимость</h5>
+        <p class="display-6">{{ '%.2f'|format(total_value) }} ₽</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-secondary">
+      <div class="card-body">
+        <h5 class="card-title">Количество наименований</h5>
+        <p class="display-6">{{ wines|length }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4">Недавно добавленные вина</h2>
+    <a class="btn btn-outline-primary" href="{{ url_for('list_wines') }}">Перейти в каталог</a>
+  </div>
+  {% if wines %}
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Название</th>
+            <th>Производитель</th>
+            <th>Регион</th>
+            <th>Год</th>
+            <th>Бутылки</th>
+            <th>Стоимость</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for wine in wines %}
+          <tr>
+            <td><a href="{{ url_for('view_wine', wine_id=wine.id) }}">{{ wine.name }}</a></td>
+            <td>{{ wine.producer or '—' }}</td>
+            <td>{{ wine.region or '—' }}</td>
+            <td>{{ wine.year or '—' }}</td>
+            <td>{{ wine.total_quantity or 0 }}</td>
+            <td>{{ '%.2f'|format(wine.estimated_value) }} ₽</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted">Добавьте первое вино, чтобы начать учёт.</p>
+  {% endif %}
+</section>
+{% endblock %}

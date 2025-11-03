@@ -1,0 +1,18 @@
+body {
+  background-color: #f8f9fa;
+}
+
+.alert-container {
+  position: relative;
+  top: 0;
+  z-index: 1000;
+}
+
+.footer {
+  background-color: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.table td, .table th {
+  vertical-align: middle;
+}

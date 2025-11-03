@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}{% if wine %}Редактировать{% else %}Добавить{% endif %} вино · Винный погреб{% endblock %}
+
+{% block content %}
+<h1 class="h3 mb-4">{% if wine %}Редактировать{% else %}Добавить{% endif %} вино</h1>
+<form method="post" class="row g-3">
+  <div class="col-md-6">
+    <label for="name" class="form-label">Название*</label>
+    <input type="text" class="form-control" id="name" name="name" value="{{ wine.name if wine else '' }}" required>
+  </div>
+  <div class="col-md-6">
+    <label for="producer" class="form-label">Производитель</label>
+    <input type="text" class="form-control" id="producer" name="producer" value="{{ wine.producer if wine else '' }}">
+  </div>
+  <div class="col-md-6">
+    <label for="region" class="form-label">Регион</label>
+    <input type="text" class="form-control" id="region" name="region" value="{{ wine.region if wine else '' }}">
+  </div>
+  <div class="col-md-6">
+    <label for="grapes" class="form-label">Сортовой состав</label>
+    <input type="text" class="form-control" id="grapes" name="grapes" value="{{ wine.grapes if wine else '' }}">
+  </div>
+  <div class="col-md-3">
+    <label for="year" class="form-label">Год</label>
+    <input type="number" class="form-control" id="year" name="year" value="{{ wine.year if wine and wine.year else '' }}" min="1900" max="2100">
+  </div>
+  <div class="col-12">
+    <label for="notes" class="form-label">Заметки</label>
+    <textarea class="form-control" id="notes" name="notes" rows="4">{{ wine.notes if wine else '' }}</textarea>
+  </div>
+  <div class="col-12 d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a class="btn btn-secondary" href="{{ url_for('list_wines') }}">Отмена</a>
+  </div>
+</form>
+{% endblock %}
